@@ -1,0 +1,29 @@
+{
+  "name": "trailwhisper",
+  "version": "0.1.0",
+  "description": "A screen-zero, pocket-first nature audio companion powered by Mastra, TabPFN, Gemma 2, and ElevenLabs",
+  "private": true,
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "dev:agent": "npm run dev --workspace=@trailwhisper/agent-server",
+    "dev:web": "npm run dev --workspace=@trailwhisper/web",
+    "build:agent": "npm run build --workspace=@trailwhisper/agent-server",
+    "build:web": "npm run build --workspace=@trailwhisper/web",
+    "build": "npm run build --workspaces"
+  },
+  "keywords": [
+    "mastra",
+    "tabpfn",
+    "gemma",
+    "elevenlabs",
+    "sentry",
+    "render",
+    "hacktoberfest2026",
+    "nature",
+    "audio-companion"
+  ],
+  "author": "TrailWhisper Team",
+  "license": "MIT"
+}

@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <radialGradient id="pineGrad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#10B981"/>
+      <stop offset="100%" stop-color="#064E3B"/>
+    </radialGradient>
+  </defs>
+  <circle cx="50" cy="50" r="48" fill="#08140E" stroke="#10B981" stroke-width="3"/>
+  <path d="M50 20 L65 42 L55 42 L70 65 L30 65 L45 42 L35 42 Z" fill="url(#pineGrad)"/>
+  <rect x="47" y="65" width="6" height="15" fill="#854D0E"/>
+  <circle cx="50" cy="50" r="4" fill="#34D399"/>
+  <!-- Sound whisper wave ripples -->
+  <path d="M72 35 C78 42, 78 58, 72 65" stroke="#34D399" stroke-width="3" stroke-linecap="round" fill="none"/>
+  <path d="M79 28 C87 38, 87 62, 79 72" stroke="#10B981" stroke-width="2.5" stroke-linecap="round" fill="none" opacity="0.7"/>
+</svg>
