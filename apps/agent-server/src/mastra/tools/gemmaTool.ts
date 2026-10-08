@@ -54,42 +54,51 @@ Whisper a brief field note alerting them to this presence right now.`;
     async (span) => {
       // 1. Primary: Use official OpenRouter TypeScript SDK
       if (openRouterApiKey) {
-        try {
-          const openRouter = new OpenRouter({
-            apiKey: openRouterApiKey,
-          });
+        const candidateModels = Array.from(new Set([
+          modelName,
+          "google/gemma-4-31b-it:free",
+          "google/gemma-3-12b-it",
+          "google/gemma-3-4b-it",
+        ]));
 
-          const response = await openRouter.chat.send({
-            chatRequest: {
-              model: modelName,
-              messages: [
-                { role: "system", content: systemPrompt },
-                { role: "user", content: userPrompt },
-              ],
-              temperature: 0.7,
-              maxTokens: 150,
-            },
-          });
+        const openRouter = new OpenRouter({
+          apiKey: openRouterApiKey,
+        });
 
-          if ("choices" in response && Array.isArray(response.choices) && response.choices.length > 0) {
-            const rawContent = response.choices[0]?.message?.content || "";
-            const textContent = typeof rawContent === "string" ? rawContent : JSON.stringify(rawContent);
-            const cleanScript = textContent.replace(/[*#_`]/g, "").trim();
+        for (const targetModel of candidateModels) {
+          try {
+            const response = await openRouter.chat.send({
+              chatRequest: {
+                model: targetModel,
+                messages: [
+                  { role: "system", content: systemPrompt },
+                  { role: "user", content: userPrompt },
+                ],
+                temperature: 0.7,
+                maxTokens: 150,
+              },
+            });
 
-            const words = cleanScript.split(/\s+/).length;
-            span?.setAttribute("ai.response.word_count", words);
-            span?.setAttribute("ai.response.model", modelName);
-            span?.setAttribute("ai.response.source", "openrouter-sdk");
+            if ("choices" in response && Array.isArray(response.choices) && response.choices.length > 0) {
+              const rawContent = response.choices[0]?.message?.content || "";
+              const textContent = typeof rawContent === "string" ? rawContent : JSON.stringify(rawContent);
+              const cleanScript = textContent.replace(/[*#_`]/g, "").trim();
 
-            return {
-              script: cleanScript,
-              wordCount: words,
-              model: `Google Gemma (${modelName}) via OpenRouter SDK`,
-              durationEstimateSec: Math.ceil(words / 2.5),
-            };
+              const words = cleanScript.split(/\s+/).length;
+              span?.setAttribute("ai.response.word_count", words);
+              span?.setAttribute("ai.response.model", targetModel);
+              span?.setAttribute("ai.response.source", "openrouter-sdk");
+
+              return {
+                script: cleanScript,
+                wordCount: words,
+                model: `Google Gemma (${targetModel}) via OpenRouter SDK`,
+                durationEstimateSec: Math.ceil(words / 2.5),
+              };
+            }
+          } catch (err: any) {
+            console.warn(`[Gemma Tool] Model ${targetModel} on OpenRouter failed (${err.message}). Trying fallback Gemma model...`);
           }
-        } catch (err: any) {
-          console.warn(`[Gemma Tool] OpenRouter SDK request failed (${err.message}). Checking local fallback runner.`);
         }
       } else {
         console.warn("[Gemma Tool] OPENROUTER_API_KEY not configured. Checking local runner / built-in synthesis.");

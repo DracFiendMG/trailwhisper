@@ -11,8 +11,34 @@ import {
   synthesizeAudioTool,
 } from "./mastra/index.js";
 
-// Load environment variables
-dotenv.config();
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
+
+// Robustly find and load .env from workspace root or current directory
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const envCandidates = [
+  path.resolve(process.cwd(), ".env"),
+  path.resolve(process.cwd(), "..", "..", ".env"),
+  path.resolve(__dirname, "..", "..", ".env"),
+  path.resolve(__dirname, "..", "..", "..", ".env"),
+];
+
+let envLoaded = false;
+for (const envPath of envCandidates) {
+  if (fs.existsSync(envPath)) {
+    dotenv.config({ path: envPath });
+    console.log(`[Config] Loaded environment variables from: ${envPath}`);
+    envLoaded = true;
+    break;
+  }
+}
+
+if (!envLoaded) {
+  dotenv.config();
+}
 
 // Best Use of Sentry ($100): Initialize instrumentation first
 initSentry();

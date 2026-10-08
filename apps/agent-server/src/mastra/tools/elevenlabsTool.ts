@@ -23,7 +23,8 @@ export interface ElevenLabsOutput {
 
 export async function runSynthesizeAudio(context: ElevenLabsInput): Promise<ElevenLabsOutput> {
   const apiKey = process.env.ELEVENLABS_API_KEY || "";
-  const voiceId = context.voice_id || process.env.ELEVENLABS_VOICE_ID || "XB0fDUnXU5ikFXr333ED";
+  // Default to George (JBFqnCBsd6RMkjVDRZzb) which is a free premade storyteller voice
+  const voiceId = context.voice_id || process.env.ELEVENLABS_VOICE_ID || "JBFqnCBsd6RMkjVDRZzb";
   const modelId = context.model_id || process.env.ELEVENLABS_MODEL_ID || "eleven_turbo_v2_5";
 
   const charCount = context.text.length;
