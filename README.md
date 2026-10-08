@@ -19,7 +19,7 @@ Most outdoor apps force hikers to stare at blue-light screens while walking thro
 
 1. **Phone stays tucked in your pocket**: Audio streams straight to your earbuds.
 2. **Tabular Foundation Model Intelligence**: Prior Labs' **TabPFN** predicts hyper-localized flora and fauna sightings based on your trail GPS, elevation, canopy density, hour, and temperature.
-3. **Conversational Whispers**: Google's open-weight **Gemma 2** crafts concise, 3-to-4 sentence spoken field notes directing your senses outward ("*Tilt your head up into the cedar boughs—notice that metallic rattle? That's a Steller's Jay caching cones...*").
+3. **Conversational Whispers**: Google's open-weight **Gemma** (`google/gemma-4-26b-a4b-it:free` via the **OpenRouter SDK**) crafts concise, 3-to-4 sentence spoken field notes directing your senses outward ("*Tilt your head up into the cedar boughs—notice that metallic rattle? That's a Steller's Jay caching cones...*").
 4. **Natural Hands-Free Voice**: **ElevenLabs** streams fluid, low-latency audio to your headphones, synchronized with lock-screen media controls via the HTML5 Media Session API.
 5. **Observability**: **Sentry Agent Tracing** instruments the entire multi-model pipeline with OpenTelemetry spans.
 
@@ -30,7 +30,7 @@ Most outdoor apps force hikers to stare at blue-light screens while walking thro
 | Partner Prize | Track Requirement | How TrailWhisper Satisfies It |
 | :--- | :--- | :--- |
 | **Best Use of TabPFN ($200)** | Use TabPFN tabular foundation model | TabPFN microservice (`services/tabpfn-service`) fits on trail observation datasets (eBird/GBIF) to yield top species probabilities without manual model re-training. |
-| **Best Use of Gemma ($200)** | Use Google's open-weight Gemma model | Mastra tool `generateFieldGuide` invokes Gemma 2 with strict screen-zero audio prompting (zero markdown, sensory directional cues, natural speech pacing). |
+| **Best Use of Gemma ($200)** | Use Google's open-weight Gemma model | Mastra tool `generateFieldGuide` invokes Google's open-weight Gemma model (`google/gemma-4-26b-a4b-it:free`) via the official `@openrouter/sdk` with strict screen-zero audio prompting (zero markdown, sensory directional cues, natural speech pacing). |
 | **Best Use of Mastra ($100)** | Orchestrate agent, memory & tools with Mastra | Mastra orchestrator (`apps/agent-server/src/mastra`) organizes the `NatureGuideAgent` and chains the tabular, reasoning, and voice tools. |
 | **Best Use of ElevenLabs ($100)** | Stream synthesized speech for listening | Mastra tool `synthesizeAudio` streams speech via ElevenLabs Turbo v2.5 directly to the client's Web Audio pipeline. |
 | **Best Use of Render ($200)** | Production deployment configuration | Production Blueprint [`render.yaml`](./render.yaml) and Dockerfiles deploy the Python ML worker, Node agent, and Vite PWA. |
@@ -135,9 +135,10 @@ cp .env.example .env
 ```
 Fill in your credentials:
 ```env
+OPENROUTER_API_KEY=your_openrouter_api_key_here
+GEMMA_MODEL_NAME=google/gemma-4-26b-a4b-it:free
 ELEVENLABS_API_KEY=your_key_here
 SENTRY_DSN=your_sentry_dsn_here
-GEMMA_API_BASE=http://localhost:11434/v1
 TABPFN_SERVICE_URL=http://localhost:8000
 ```
 

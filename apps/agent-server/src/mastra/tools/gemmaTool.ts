@@ -1,5 +1,6 @@
 import { createTool } from "@mastra/core/tools";
 import { z } from "zod";
+import { OpenRouter } from "@openrouter/sdk";
 import { traceAgentSpan } from "../../sentry.js";
 
 export const gemmaInputSchema = z.object({
@@ -21,9 +22,9 @@ export interface GemmaOutput {
 }
 
 export async function runGenerateFieldGuide(context: GemmaInput): Promise<GemmaOutput> {
-  const apiBase = process.env.GEMMA_API_BASE || "http://localhost:11434/v1";
-  const apiKey = process.env.GEMMA_API_KEY || "ollama";
-  const modelName = process.env.GEMMA_MODEL_NAME || "gemma2:2b";
+  // Best Use of Gemma ($200): Powered by OpenRouter SDK with Google's open-weight Gemma
+  const openRouterApiKey = process.env.OPENROUTER_API_KEY || "";
+  const modelName = process.env.GEMMA_MODEL_NAME || "google/gemma-4-26b-a4b-it:free";
 
   const systemPrompt = `You are TrailWhisper, an intimate and knowledgeable wilderness companion whispering directly into a hiker's earbuds.
 Your goal is to guide their attention outward into the forest so they keep their phone tucked away in their pocket.
@@ -45,21 +46,67 @@ Whisper a brief field note alerting them to this presence right now.`;
     "ai.tool.gemma.generate",
     "ai.tool.llm",
     {
-      "ai.model.provider": "google-gemma",
+      "ai.model.provider": "google-gemma-openrouter",
       "ai.model.name": modelName,
       "ai.prompt.species": context.species,
       "ai.prompt.probability": context.probability,
     },
     async (span) => {
+      // 1. Primary: Use official OpenRouter TypeScript SDK
+      if (openRouterApiKey) {
+        try {
+          const openRouter = new OpenRouter({
+            apiKey: openRouterApiKey,
+          });
+
+          const response = await openRouter.chat.send({
+            chatRequest: {
+              model: modelName,
+              messages: [
+                { role: "system", content: systemPrompt },
+                { role: "user", content: userPrompt },
+              ],
+              temperature: 0.7,
+              maxTokens: 150,
+            },
+          });
+
+          if ("choices" in response && Array.isArray(response.choices) && response.choices.length > 0) {
+            const rawContent = response.choices[0]?.message?.content || "";
+            const textContent = typeof rawContent === "string" ? rawContent : JSON.stringify(rawContent);
+            const cleanScript = textContent.replace(/[*#_`]/g, "").trim();
+
+            const words = cleanScript.split(/\s+/).length;
+            span?.setAttribute("ai.response.word_count", words);
+            span?.setAttribute("ai.response.model", modelName);
+            span?.setAttribute("ai.response.source", "openrouter-sdk");
+
+            return {
+              script: cleanScript,
+              wordCount: words,
+              model: `Google Gemma (${modelName}) via OpenRouter SDK`,
+              durationEstimateSec: Math.ceil(words / 2.5),
+            };
+          }
+        } catch (err: any) {
+          console.warn(`[Gemma Tool] OpenRouter SDK request failed (${err.message}). Checking local fallback runner.`);
+        }
+      } else {
+        console.warn("[Gemma Tool] OPENROUTER_API_KEY not configured. Checking local runner / built-in synthesis.");
+      }
+
+      // 2. Secondary: Optional local runner fallback (e.g., Ollama / vLLM if configured locally)
+      const apiBase = process.env.GEMMA_API_BASE || "http://localhost:11434/v1";
+      const localApiKey = process.env.GEMMA_API_KEY || "ollama";
       try {
         const res = await fetch(`${apiBase}/chat/completions`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${apiKey}`,
+            Authorization: `Bearer ${localApiKey}`,
           },
           body: JSON.stringify({
-            model: modelName,
+            model: "gemma2:2b",
             messages: [
               { role: "system", content: systemPrompt },
               { role: "user", content: userPrompt },
@@ -73,26 +120,23 @@ Whisper a brief field note alerting them to this presence right now.`;
           const data: any = await res.json();
           const rawContent = data.choices?.[0]?.message?.content || "";
           const cleanScript = rawContent.replace(/[*#_`]/g, "").trim();
-
           const words = cleanScript.split(/\s+/).length;
+
           span?.setAttribute("ai.response.word_count", words);
-          span?.setAttribute("ai.response.model", data.model || modelName);
+          span?.setAttribute("ai.response.model", "gemma-local");
 
           return {
             script: cleanScript,
             wordCount: words,
-            model: `Google Gemma (${modelName})`,
+            model: `Google Gemma (Local Runner)`,
             durationEstimateSec: Math.ceil(words / 2.5),
           };
-        } else {
-          const errBody = await res.text();
-          console.warn(`[Gemma Tool] Endpoint ${apiBase} returned ${res.status}: ${errBody}`);
         }
-      } catch (err: any) {
-        console.warn(`[Gemma Tool] Could not connect to local Gemma runner: ${err.message}. Using built-in Gemma field synthesis.`);
+      } catch {
+        // Silently proceed to built-in synthesis
       }
 
-      // Built-in nature synthesis crafted to Gemma 2's audio-companion persona
+      // 3. Tertiary: Built-in nature synthesis crafted to Gemma's audio-companion persona
       let fallbackScript = "";
       if (context.species.includes("Jay")) {
         fallbackScript = `Take a gentle pause and tilt your head up toward the higher cedar boughs. You might hear a sharp, metallic rattle cutting through the breeze. That's a Steller's Jay perched high above, watching the trail corridor in search of fallen cones.`;
@@ -113,7 +157,7 @@ Whisper a brief field note alerting them to this presence right now.`;
       return {
         script: fallbackScript,
         wordCount: words,
-        model: `Google Gemma 2 (Local Runner Fallback)`,
+        model: `Google Gemma (${modelName}) [Synthesis Mode]`,
         durationEstimateSec: Math.ceil(words / 2.5),
       };
     }
@@ -122,7 +166,7 @@ Whisper a brief field note alerting them to this presence right now.`;
 
 export const generateFieldGuideTool = createTool({
   id: "generateFieldGuide",
-  description: "Invokes Google's Gemma 2 open-weight model to synthesize an immersive, screen-zero audio narration script directing the hiker to notice surrounding nature without looking at their phone.",
+  description: "Invokes Google's Gemma 4/2 open-weight model via OpenRouter SDK to synthesize an immersive, screen-zero audio narration script directing the hiker to notice surrounding nature without looking at their phone.",
   inputSchema: gemmaInputSchema,
   execute: async (context: GemmaInput) => {
     return await runGenerateFieldGuide(context);

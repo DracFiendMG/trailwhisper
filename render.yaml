@@ -37,10 +37,12 @@ services:
           type: web
           name: trailwhisper-tabpfn
           property: host
+      - key: OPENROUTER_API_KEY
+        sync: false
+      - key: GEMMA_MODEL_NAME
+        value: google/gemma-4-26b-a4b-it:free
       - key: GEMMA_API_BASE
         value: http://localhost:11434/v1
-      - key: GEMMA_MODEL_NAME
-        value: gemma2:2b
       - key: ELEVENLABS_API_KEY
         sync: false
       - key: ELEVENLABS_VOICE_ID
