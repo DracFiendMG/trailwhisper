@@ -1,4 +1,5 @@
 import { Mastra } from "@mastra/core";
+import { LibSQLStore } from "@mastra/libsql";
 import { natureGuideAgent } from "./agents/natureGuide.js";
 import {
   predictSightingsTool,
@@ -17,8 +18,14 @@ import {
   ElevenLabsOutput,
 } from "./tools/elevenlabsTool.js";
 
-// Centralized Agent and Tools Orchestration
+const storageUrl = process.env.MASTRA_STORAGE_URL || "file:trailwhisper.db";
+
+// Centralized Agent and Tools Orchestration with persistent LibSQL storage
 export const mastra = new Mastra({
+  storage: new LibSQLStore({
+    id: "trailwhisper-storage",
+    url: storageUrl,
+  }),
   agents: {
     natureGuide: natureGuideAgent,
   },

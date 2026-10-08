@@ -31,7 +31,7 @@ TrailWhisper couples a TypeScript agent orchestrator with a specialized Python M
 
 | Component | Technology | Role & Integration |
 | :--- | :--- | :--- |
-| **Agent Orchestrator** | TypeScript, Node.js, `@mastra/core` | Centralizes agent state, session memory, tool coordination (`predictSightings`, `generateFieldGuide`, `synthesizeAudio`), and pipeline dispatch. |
+| **Agent Orchestrator & Storage** | TypeScript, Node.js, `@mastra/core`, `@mastra/libsql` | Centralizes agent state, persistent LibSQL/SQLite storage, session memory, tool coordination (`predictSightings`, `generateFieldGuide`, `synthesizeAudio`), and pipeline dispatch. |
 | **Tabular Biodiversity Engine** | Python 3.11, Prior Labs `TabPFN`, FastAPI | Ingests trail biodiversity datasets (eBird/GBIF observations) and leverages TabPFN tabular foundation models to predict top species occurrence probabilities. |
 | **Reasoning & Audio Scripts** | Google's open-weight `Gemma` via `@openrouter/sdk` | Generates audio-first narration prompts with zero markdown formatting, spoken cadence, and directional sensory cues. |
 | **Voice Synthesis Engine** | ElevenLabs Node SDK & Streaming API | Streams lifelike, natural-pacing narration audio directly to the hiker's headphones with zero screen interaction. |

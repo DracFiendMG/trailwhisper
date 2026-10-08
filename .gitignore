@@ -40,3 +40,9 @@ Thumbs.db
 
 # Sentry
 .sentry-native/
+
+# Local databases (LibSQL / SQLite)
+*.db
+*.db-journal
+*.db-wal
+*.db-shm

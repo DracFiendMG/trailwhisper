@@ -10,7 +10,7 @@ TrailWhisper predicts flora and fauna sightings along hiking trails using tabula
 
 | Architectural Pillar | Core Technology | Engineering Role & Integration |
 | :--- | :--- | :--- |
-| **Agent Orchestration** | Mastra (`@mastra/core`) | Agent state, memory, and workflow tools (`predictSightings`, `generateFieldGuide`, `synthesizeAudio`). |
+| **Agent Orchestration & Storage** | Mastra (`@mastra/core`), `@mastra/libsql` | Agent state, persistent LibSQL/SQLite storage, memory, and workflow tools (`predictSightings`, `generateFieldGuide`, `synthesizeAudio`). |
 | **Tabular Biodiversity Engine** | Prior Labs TabPFN & FastAPI | Tabular foundation model microservice evaluating real-time spatial and environmental trail data. |
 | **Narration & Sensory Prompts** | Google Gemma via OpenRouter SDK | Spoken-first, markdown-free prompt synthesis tailored for immediate auditory delivery. |
 | **Voice Streaming Engine** | ElevenLabs Streaming API | Ultra-low-latency voice synthesis streaming natural pacing to the hiker's headphones. |

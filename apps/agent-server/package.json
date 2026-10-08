@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@mastra/core": "^1.74.0",
+    "@mastra/libsql": "^1.25.1",
     "@openrouter/sdk": "^1.4.25",
     "@sentry/node": "^8.34.0",
     "@sentry/profiling-node": "^8.34.0",

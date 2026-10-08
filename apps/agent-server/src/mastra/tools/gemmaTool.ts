@@ -56,7 +56,7 @@ Whisper a brief field note alerting them to this presence right now.`;
       if (openRouterApiKey) {
         const candidateModels = Array.from(new Set([
           modelName,
-          "google/gemma-4-31b-it:free",
+          "google/gemma-4-26b-a4b-it:free",
           "google/gemma-3-12b-it",
           "google/gemma-3-4b-it",
         ]));
