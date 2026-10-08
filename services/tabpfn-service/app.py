@@ -130,8 +130,18 @@ def load_dataset_and_train_model():
         device = os.getenv("TABPFN_DEVICE", "cpu")
         n_ensemble = int(os.getenv("TABPFN_N_ENSEMBLE", "4"))
         
-        logger.info(f"Initializing TabPFNClassifier (device={device}, n_ensemble={n_ensemble})...")
-        tabpfn = TabPFNClassifier(device=device, n_ensemble_configurations=n_ensemble)
+        logger.info(f"Initializing TabPFNClassifier (device={device})...")
+        try:
+            # TabPFN v2.0+ standard initialization (Prior Labs)
+            tabpfn = TabPFNClassifier(device=device)
+        except TypeError:
+            try:
+                # TabPFN legacy v0.1 capitalization
+                tabpfn = TabPFNClassifier(device=device, N_ensemble_configurations=n_ensemble)
+            except TypeError:
+                # Fallback to no-argument init
+                tabpfn = TabPFNClassifier()
+
         tabpfn.fit(X, y)
         model_instance = tabpfn
         model_type = "TabPFN v2.0 (Foundation Model - Prior Labs)"
