@@ -19,6 +19,8 @@ services:
         value: cpu
       - key: TABPFN_N_ENSEMBLE
         value: 4
+      - key: TABPFN_API_KEY
+        sync: false
 
   # 2. Agent Orchestration Server (Node.js + Mastra + Sentry Tracing)
   - type: web

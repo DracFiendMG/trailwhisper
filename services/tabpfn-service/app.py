@@ -14,6 +14,17 @@ from pydantic import BaseModel, Field
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger("tabpfn-service")
 
+# Automatically load .env from service directory or workspace root
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+    root_env = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".env"))
+    if os.path.exists(root_env):
+        load_dotenv(root_env)
+        logger.info(f"Loaded environment variables from {root_env}")
+except Exception as env_err:
+    logger.debug(f"dotenv load skipped: {env_err}")
+
 app = FastAPI(
     title="TrailWhisper TabPFN Biodiversity Service",
     description="Microservice using Prior Labs' TabPFN tabular foundation model to predict flora/fauna sightings along hiking trails.",
@@ -124,13 +135,34 @@ def load_dataset_and_train_model():
     y = data_df["species_observed"]
     classes_list = sorted(list(y.unique()))
 
-    # Attempt 1: Prior Labs TabPFN Classifier
+    # Attempt 1: Prior Labs Official Cloud API (if TABPFN_API_KEY / TABPFN_TOKEN is configured)
+    api_key = os.getenv("TABPFN_API_KEY") or os.getenv("TABPFN_TOKEN")
+    if api_key and api_key != "tabpfn_sk_1234":
+        os.environ["TABPFN_TOKEN"] = api_key
+        os.environ["TABPFN_API_KEY"] = api_key
+        try:
+            from tabpfn_client import init as tabpfn_init, TabPFNClassifier as CloudTabPFNClassifier
+            logger.info("Connecting to Prior Labs TabPFN Cloud API using API key...")
+            try:
+                tabpfn_init(api_key=api_key)
+            except Exception:
+                pass
+            cloud_tabpfn = CloudTabPFNClassifier()
+            cloud_tabpfn.fit(X, y)
+            model_instance = cloud_tabpfn
+            model_type = "TabPFN Cloud (Prior Labs Official API)"
+            logger.info("Successfully authenticated and fitted TabPFN Cloud Foundation Model via Prior Labs API!")
+            return
+        except Exception as cloud_err:
+            logger.warning(f"Could not initialize TabPFN via cloud client ({cloud_err}). Attempting local TabPFN...")
+
+    # Attempt 2: Prior Labs Local TabPFN Foundation Model
     try:
         from tabpfn import TabPFNClassifier
         device = os.getenv("TABPFN_DEVICE", "cpu")
         n_ensemble = int(os.getenv("TABPFN_N_ENSEMBLE", "4"))
         
-        logger.info(f"Initializing TabPFNClassifier (device={device})...")
+        logger.info(f"Initializing local TabPFNClassifier (device={device})...")
         try:
             # TabPFN v2.0+ standard initialization (Prior Labs)
             tabpfn = TabPFNClassifier(device=device)
@@ -139,7 +171,7 @@ def load_dataset_and_train_model():
                 # TabPFN legacy v0.1 capitalization
                 tabpfn = TabPFNClassifier(device=device, N_ensemble_configurations=n_ensemble)
             except TypeError:
-                # Fallback to no-argument init
+                # Fallback to default init
                 tabpfn = TabPFNClassifier()
 
         tabpfn.fit(X, y)
