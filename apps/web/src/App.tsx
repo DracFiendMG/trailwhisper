@@ -198,11 +198,11 @@ export const App: React.FC = () => {
 
         <div className="badge-row">
           <span className="badge-pill">
-            <Sparkles size={12} /> Hacktoberfest 2026
+            <Sparkles size={12} /> Pocket AI Companion
           </span>
           <span className="badge-pill">Mastra</span>
           <span className="badge-pill">TabPFN</span>
-          <span className="badge-pill">Gemma 2</span>
+          <span className="badge-pill">Gemma 4</span>
           <span className="badge-pill">ElevenLabs</span>
           <span className="badge-pill">Sentry</span>
         </div>
@@ -235,7 +235,7 @@ export const App: React.FC = () => {
           onClick={() => setIsPocketModeActive(!isPocketModeActive)}
         >
           <Headphones size={18} />
-          <span>{isPocketModeActive ? "Pocket Mode Active (Touch Grass)" : "Arm Pocket Mode"}</span>
+          <span>{isPocketModeActive ? "Pocket Mode Active" : "Arm Pocket Mode"}</span>
         </button>
       </section>
 

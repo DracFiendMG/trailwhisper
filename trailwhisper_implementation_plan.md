@@ -1,22 +1,21 @@
-# TrailWhisper: Implementation & Architecture Plan
+# TrailWhisper: System Architecture & Technical Specification
 
-**Hacktoberfest 2026 Week 1 Challenge ("Touch Grass" — Oct 5–11, 2026)**  
 *Screen-Zero, Pocket-First AI Audio Companion for Nature Trails*
 
 ---
 
-## 1. Executive Summary & Prize Target Alignment
+## 1. Executive Summary & Core Engineering Pillars
 
 TrailWhisper predicts flora and fauna sightings along hiking trails using tabular foundation models and whispers contextual, immersive nature stories into the hiker's earbuds as they walk—keeping their eyes on the trail and phone in their pocket.
 
-| Prize Target | Prize | Technology / Integration Strategy |
+| Architectural Pillar | Core Technology | Engineering Role & Integration |
 | :--- | :--- | :--- |
-| **Best Use of Mastra** | $100 | Mastra agent (`@mastra/core`), memory, workflow tools (`predictSightings`, `generateFieldGuide`, `synthesizeAudio`). |
-| **Best Use of TabPFN** | $200 | Prior Labs' TabPFN tabular foundation model running in a FastAPI microservice on curated eBird/GBIF trail dataset. |
-| **Best Use of Gemma** | $200 | Google's open-weight Gemma 2 model (`gemma-2-2b-it` / `gemma-2-9b-it`) prompt-engineered for conversational, audio-first narration. |
-| **Best Use of ElevenLabs** | $100 | ElevenLabs Flash v2 / Turbo v2.5 low-latency streaming TTS API for natural pacing. |
-| **Best Use of Render** | $200 | Multi-service `render.yaml` Blueprint + production Dockerfiles for Node agent and Python ML microservice. |
-| **Best Use of Sentry** | $100 | Sentry Agent Tracing (`@sentry/node`) with OpenTelemetry spans tracking tool latency, TabPFN calls, and audio buffer times. |
+| **Agent Orchestration** | Mastra (`@mastra/core`) | Agent state, memory, and workflow tools (`predictSightings`, `generateFieldGuide`, `synthesizeAudio`). |
+| **Tabular Biodiversity Engine** | Prior Labs TabPFN & FastAPI | Tabular foundation model microservice evaluating real-time spatial and environmental trail data. |
+| **Narration & Sensory Prompts** | Google Gemma via OpenRouter SDK | Spoken-first, markdown-free prompt synthesis tailored for immediate auditory delivery. |
+| **Voice Streaming Engine** | ElevenLabs Streaming API | Ultra-low-latency voice synthesis streaming natural pacing to the hiker's headphones. |
+| **Observability & Tracing** | Sentry Agent Tracing (`@sentry/node`) | Distributed OpenTelemetry spans tracking agent workflow, tool latency, and model metrics. |
+| **Production Cloud Deployment** | Render Blueprint (`render.yaml`) | Multi-service orchestration for Python ML microservice, Node.js agent, and static web PWA. |
 
 ---
 

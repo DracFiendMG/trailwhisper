@@ -1,6 +1,6 @@
 import * as Sentry from "@sentry/node";
 
-// Best Use of Sentry ($100): AI Agent Tracing with OpenTelemetry Spans
+// AI Agent Tracing with OpenTelemetry Spans
 export function initSentry() {
   const dsn = process.env.SENTRY_DSN || "";
   const environment = process.env.SENTRY_ENVIRONMENT || "development";
@@ -21,14 +21,13 @@ export function initSentry() {
     environment,
     tracesSampleRate,
     integrations,
-    // Custom release tag for Hacktoberfest 2026 TrailWhisper
     release: "trailwhisper@0.1.0",
     beforeSend(event) {
       // Annotate event with agent system tags
       if (event.tags) {
         event.tags["ai.framework"] = "mastra";
         event.tags["ai.model.tabular"] = "tabpfn";
-        event.tags["ai.model.reasoning"] = "gemma-2";
+        event.tags["ai.model.reasoning"] = "gemma";
       }
       return event;
     },

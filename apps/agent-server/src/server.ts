@@ -40,7 +40,7 @@ if (!envLoaded) {
   dotenv.config();
 }
 
-// Best Use of Sentry ($100): Initialize instrumentation first
+// Initialize Sentry AI agent tracing
 initSentry();
 
 const app = express();

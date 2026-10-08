@@ -22,7 +22,7 @@ export interface GemmaOutput {
 }
 
 export async function runGenerateFieldGuide(context: GemmaInput): Promise<GemmaOutput> {
-  // Best Use of Gemma ($200): Powered by OpenRouter SDK with Google's open-weight Gemma
+  // Powered by OpenRouter SDK with Google's open-weight Gemma
   const openRouterApiKey = process.env.OPENROUTER_API_KEY || "";
   const modelName = process.env.GEMMA_MODEL_NAME || "google/gemma-4-26b-a4b-it:free";
 

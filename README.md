@@ -1,40 +1,43 @@
 # 🌲 TrailWhisper
 
 > **Screen-Zero, Pocket-First AI Audio Companion for Nature Trails**  
-> *Built for Hacktoberfest 2026 Week 1 Challenge ("Touch Grass" — Oct 5–11, 2026)*
+> *Predicts nearby flora and fauna sightings with tabular foundation models and whispers contextual nature stories directly through your earbuds as you hike.*
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-emerald.svg)](LICENSE)
-[![Framework: Mastra](https://img.shields.io/badge/Orchestrator-Mastra-black.svg)](https://mastra.ai)
-[![Tabular: TabPFN](https://img.shields.io/badge/Tabular_Model-Prior_Labs_TabPFN-blue.svg)](https://github.com/automl/TabPFN)
-[![Reasoning: Gemma 2](https://img.shields.io/badge/LLM-Google_Gemma_2-orange.svg)](https://deepmind.google/technologies/gemma/)
-[![Voice: ElevenLabs](https://img.shields.io/badge/TTS-ElevenLabs_Turbo_v2.5-blueviolet.svg)](https://elevenlabs.io)
-[![Observability: Sentry](https://img.shields.io/badge/Tracing-Sentry_OpenTelemetry-darkred.svg)](https://sentry.io)
-[![Deployment: Render](https://img.shields.io/badge/Deploy-Render_Blueprint-46e3b7.svg)](https://render.com)
+[![Orchestrator: Mastra](https://img.shields.io/badge/Orchestrator-Mastra-black.svg)](https://mastra.ai)
+[![Tabular Model: TabPFN](https://img.shields.io/badge/Tabular_Model-Prior_Labs_TabPFN-blue.svg)](https://github.com/automl/TabPFN)
+[![LLM: Google Gemma](https://img.shields.io/badge/Reasoning-Google_Gemma-orange.svg)](https://deepmind.google/technologies/gemma/)
+[![Voice: ElevenLabs](https://img.shields.io/badge/TTS-ElevenLabs_Turbo-blueviolet.svg)](https://elevenlabs.io)
+[![Observability: Sentry](https://img.shields.io/badge/Observability-Sentry_OpenTelemetry-darkred.svg)](https://sentry.io)
+[![Deployment: Render](https://img.shields.io/badge/Deployment-Render_Blueprint-46e3b7.svg)](https://render.com)
 
 ---
 
-## 🧭 The Vision: Screen-Zero & "Touch Grass"
+## 🧭 The Screen-Zero Experience
 
-Most outdoor apps force hikers to stare at blue-light screens while walking through pristine forests. **TrailWhisper** flips the interaction paradigm:
+Most outdoor and nature guide apps force hikers to keep their eyes glued to phone screens while walking through forests and trails. **TrailWhisper** inverts the interaction paradigm:
 
-1. **Phone stays tucked in your pocket**: Audio streams straight to your earbuds.
-2. **Tabular Foundation Model Intelligence**: Prior Labs' **TabPFN** predicts hyper-localized flora and fauna sightings based on your trail GPS, elevation, canopy density, hour, and temperature.
-3. **Conversational Whispers**: Google's open-weight **Gemma** (`google/gemma-4-26b-a4b-it:free` via the **OpenRouter SDK**) crafts concise, 3-to-4 sentence spoken field notes directing your senses outward ("*Tilt your head up into the cedar boughs—notice that metallic rattle? That's a Steller's Jay caching cones...*").
-4. **Natural Hands-Free Voice**: **ElevenLabs** streams fluid, low-latency audio to your headphones, synchronized with lock-screen media controls via the HTML5 Media Session API.
-5. **Observability**: **Sentry Agent Tracing** instruments the entire multi-model pipeline with OpenTelemetry spans.
+1. **Keep Your Phone in Your Pocket**: Audio streams directly to your headphones or earbuds as you walk.
+2. **Tabular Foundation Model Predictions**: Prior Labs' **TabPFN** evaluates hyper-localized ecological factors (GPS coordinates, elevation, hour, month, canopy density, and temperature) against curated trail biodiversity data to estimate species sighting probabilities in real time.
+3. **Conversational Audio Whispers**: Google's open-weight **Gemma** (`google/gemma-4-26b-a4b-it:free` via the **OpenRouter SDK**) synthesizes concise, immersive 3-to-4 sentence spoken field notes directing your senses outward into the canopy or trail edges (*"Take a gentle pause and tilt your head up toward the higher cedar boughs... Hear that metallic rattle? That's a Steller's Jay caching cones..."*).
+4. **Natural Hands-Free Voice**: **ElevenLabs** streams fluid, low-latency spoken audio directly to your earbuds, paired with the HTML5 Media Session API for lock-screen media controls so your screen stays dark.
+5. **Observability**: **Sentry Agent Tracing** instruments the entire multi-model pipeline with OpenTelemetry spans tracking latency, tool execution, and token counts.
 
 ---
 
-## 🏆 Target Hackathon Prize Categories Satisfied
+## ⚡ Architecture & Technology Stack
 
-| Partner Prize | Track Requirement | How TrailWhisper Satisfies It |
+TrailWhisper couples a TypeScript agent orchestrator with a specialized Python ML microservice:
+
+| Component | Technology | Role & Integration |
 | :--- | :--- | :--- |
-| **Best Use of TabPFN ($200)** | Use TabPFN tabular foundation model | TabPFN microservice (`services/tabpfn-service`) fits on trail observation datasets (eBird/GBIF) to yield top species probabilities without manual model re-training. |
-| **Best Use of Gemma ($200)** | Use Google's open-weight Gemma model | Mastra tool `generateFieldGuide` invokes Google's open-weight Gemma model (`google/gemma-4-26b-a4b-it:free`) via the official `@openrouter/sdk` with strict screen-zero audio prompting (zero markdown, sensory directional cues, natural speech pacing). |
-| **Best Use of Mastra ($100)** | Orchestrate agent, memory & tools with Mastra | Mastra orchestrator (`apps/agent-server/src/mastra`) organizes the `NatureGuideAgent` and chains the tabular, reasoning, and voice tools. |
-| **Best Use of ElevenLabs ($100)** | Stream synthesized speech for listening | Mastra tool `synthesizeAudio` streams speech via ElevenLabs Turbo v2.5 directly to the client's Web Audio pipeline. |
-| **Best Use of Render ($200)** | Production deployment configuration | Production Blueprint [`render.yaml`](./render.yaml) and Dockerfiles deploy the Python ML worker, Node agent, and Vite PWA. |
-| **Best Use of Sentry ($100)** | Instrument AI Agent Tracing | `@sentry/node` instruments OpenTelemetry spans (`ai.agent.trail_step`, `ai.tool.tabpfn.predict`, `ai.tool.gemma.generate`, `ai.tool.elevenlabs.tts`). |
+| **Agent Orchestrator** | TypeScript, Node.js, `@mastra/core` | Centralizes agent state, session memory, tool coordination (`predictSightings`, `generateFieldGuide`, `synthesizeAudio`), and pipeline dispatch. |
+| **Tabular Biodiversity Engine** | Python 3.11, Prior Labs `TabPFN`, FastAPI | Ingests trail biodiversity datasets (eBird/GBIF observations) and leverages TabPFN tabular foundation models to predict top species occurrence probabilities. |
+| **Reasoning & Audio Scripts** | Google's open-weight `Gemma` via `@openrouter/sdk` | Generates audio-first narration prompts with zero markdown formatting, spoken cadence, and directional sensory cues. |
+| **Voice Synthesis Engine** | ElevenLabs Node SDK & Streaming API | Streams lifelike, natural-pacing narration audio directly to the hiker's headphones with zero screen interaction. |
+| **Client Interface** | Vite, React, TypeScript, HTML5 Web APIs | Mobile-ready PWA featuring device Geolocation tracking, lock-screen MediaSession controls, a live TabPFN radar HUD, and an Alpine Trail Simulator. |
+| **Observability** | `@sentry/node`, OpenTelemetry | Captures distributed trace waterfalls for agent runs, tool latency, and token metrics. |
+| **Deployment** | Render Blueprint (`render.yaml`), Docker | Multi-service orchestration managing the Python ML worker, Node agent service, and Vite static PWA. |
 
 ---
 
@@ -61,7 +64,7 @@ flowchart TD
     end
 
     subgraph ExternalEngines ["AI & Audio Providers"]
-        Gemma["Google Gemma 2 (Ollama / vLLM / Endpoint)"]
+        Gemma["Google Gemma (OpenRouter SDK)"]
         ElevenLabs["ElevenLabs Voice Streaming API"]
     end
 
@@ -80,7 +83,7 @@ flowchart TD
     ToolAudio -->|"Text Stream"| ElevenLabs
     ElevenLabs -->|"MP3 Stream"| ToolAudio
     ToolAudio --> Agent
-    Agent -->|"Audio URL / Base64 + Telemetry"| Audio
+    Agent -->|"Audio Stream + Telemetry"| Audio
 ```
 
 ---
@@ -94,7 +97,7 @@ trailwhisper/
 │   │   ├── src/
 │   │   │   ├── mastra/
 │   │   │   │   ├── agents/        # NatureGuideAgent definition
-│   │   │   │   ├── tools/         # TabPFN, Gemma 2, and ElevenLabs tools
+│   │   │   │   ├── tools/         # TabPFN, Gemma, and ElevenLabs tools
 │   │   │   │   └── index.ts       # Mastra core exports
 │   │   │   ├── sentry.ts          # Sentry OpenTelemetry spans & profiling
 │   │   │   └── server.ts          # Express API server (/api/trail/step)
@@ -105,7 +108,7 @@ trailwhisper/
 │       │   ├── components/        # AudioPlayer, SightingsRadar, TelemetryDrawer
 │       │   ├── utils/             # Olympic Trail Simulator & waypoints
 │       │   ├── App.tsx            # Pocket mode HUD
-│       │   └── index.css          # Rich forest dark mode & glassmorphism
+│       │   └── index.css          # Forest dark mode & glassmorphism
 │       └── package.json
 ├── services/
 │   └── tabpfn-service/            # Python FastAPI microservice for TabPFN
@@ -124,9 +127,9 @@ trailwhisper/
 
 ### 1. Prerequisites
 - **Node.js**: v20+
-- **Python**: 3.11+ (recommended for native PyTorch & TabPFN weights)
-- (Optional) **Ollama**: running `ollama run gemma2:2b`
-- (Optional) **ElevenLabs API Key**: for production voice streaming
+- **Python**: 3.11+
+- **OpenRouter API Key**: for Google Gemma model inference
+- **ElevenLabs API Key**: for natural voice streaming
 
 ### 2. Configure Environment Variables
 Copy `.env.example` to `.env`:
@@ -137,7 +140,9 @@ Fill in your credentials:
 ```env
 OPENROUTER_API_KEY=your_openrouter_api_key_here
 GEMMA_MODEL_NAME=google/gemma-4-26b-a4b-it:free
-ELEVENLABS_API_KEY=your_key_here
+ELEVENLABS_API_KEY=your_elevenlabs_api_key_here
+ELEVENLABS_VOICE_ID=JBFqnCBsd6RMkjVDRZzb
+TABPFN_API_KEY=your_tabpfn_api_key_here
 SENTRY_DSN=your_sentry_dsn_here
 TABPFN_SERVICE_URL=http://localhost:8000
 ```
@@ -165,25 +170,25 @@ npm run dev:web
 
 ---
 
-## 🎧 Testing Screen-Zero Pocket Mode
+## 🎧 Testing the Screen-Zero Experience
 
 1. Connect your earbuds and open `http://localhost:3000`.
 2. Toggle **Pocket Mode Active**.
-3. Use the **Trail Simulator** to step through the Olympic Trail waypoints (Valley floor → Hemlock groves → Old growth ridge → Subalpine meadow).
+3. Use the **Trail Simulator** to step through Olympic Trail waypoints (Valley floor → Hemlock groves → Old growth ridge → Subalpine meadow).
 4. Watch the lock-screen or notification bar:
-   - Media Session controls will display the current species (e.g., *"Whisper: Steller's Jay nearby"*).
-   - Press play/pause directly from your headphones or lock-screen without unlocking your device!
+   - Media Session controls display the current species (e.g., *"Whisper: Steller's Jay nearby"*).
+   - Play/pause or trigger the next waypoint directly from your headphones or lock-screen without unlocking your phone.
 5. Inspect real-time **Sentry Agent Tracing** spans and TabPFN confidence scores in the telemetry drawer.
 
 ---
 
-## 🚢 Deploying to Render
+## 🚢 Production Deployment (Render)
 
 This repository includes a multi-service [`render.yaml`](./render.yaml) Blueprint:
 
 1. Push your repository to GitHub.
 2. In the [Render Dashboard](https://dashboard.render.com), click **New +** → **Blueprint**.
-3. Connect your repository. Render will automatically detect and deploy:
+3. Connect your repository. Render automatically provisions and deploys:
    - `trailwhisper-tabpfn`: Python 3.11 Docker Web Service.
    - `trailwhisper-agent`: Node.js 20 Docker Web Service with Mastra & Sentry.
    - `trailwhisper-web`: Static React PWA with automatic routing.
@@ -191,4 +196,4 @@ This repository includes a multi-service [`render.yaml`](./render.yaml) Blueprin
 ---
 
 ## 📜 License
-MIT License. Crafted for Hacktoberfest 2026.
+MIT License.

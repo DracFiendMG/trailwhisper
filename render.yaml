@@ -1,6 +1,6 @@
 # ----------------------------------------------------------------------------
 # TrailWhisper Render Blueprint
-# Best Use of Render ($200) - Production-Ready Multi-Service Architecture
+# Production-Ready Multi-Service Architecture
 # ----------------------------------------------------------------------------
 services:
   # 1. Tabular Prediction Microservice (Python + Prior Labs TabPFN)

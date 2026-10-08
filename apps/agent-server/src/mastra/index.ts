@@ -17,7 +17,7 @@ import {
   ElevenLabsOutput,
 } from "./tools/elevenlabsTool.js";
 
-// Best Use of Mastra ($100): Centralized Agent and Tools Orchestration
+// Centralized Agent and Tools Orchestration
 export const mastra = new Mastra({
   agents: {
     natureGuide: natureGuideAgent,
