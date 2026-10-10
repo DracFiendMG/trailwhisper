@@ -35,7 +35,11 @@ export interface TabPFNOutput {
 }
 
 export async function runPredictSightings(context: TabPFNInput): Promise<TabPFNOutput> {
-  const serviceUrl = process.env.TABPFN_SERVICE_URL || "http://localhost:8000";
+  let serviceUrl = process.env.TABPFN_SERVICE_URL || "http://localhost:8000";
+  if (!serviceUrl.startsWith("http://") && !serviceUrl.startsWith("https://")) {
+    serviceUrl = `http://${serviceUrl}`;
+  }
+  serviceUrl = serviceUrl.replace(/\/$/, "");
 
   return await traceAgentSpan(
     "ai.tool.tabpfn.predict",

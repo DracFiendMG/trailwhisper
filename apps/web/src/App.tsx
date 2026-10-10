@@ -47,11 +47,20 @@ export const App: React.FC = () => {
 
   const currentWaypoint: TrailWaypoint = OLYMPIC_TRAIL_WAYPOINTS[selectedWaypointIndex];
 
+  const getAgentStepUrl = () => {
+    const rawUrl = (import.meta as any).env?.VITE_AGENT_SERVER_URL;
+    if (!rawUrl) return "/api/trail/step";
+    const base = rawUrl.startsWith("http://") || rawUrl.startsWith("https://")
+      ? rawUrl
+      : `https://${rawUrl}`;
+    return `${base.replace(/\/$/, "")}/api/trail/step`;
+  };
+
   // Request waypoint analysis from Mastra agent server
   const triggerTrailStep = async (waypoint: TrailWaypoint) => {
     setIsLoadingStep(true);
     try {
-      const response = await fetch("/api/trail/step", {
+      const response = await fetch(getAgentStepUrl(), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
